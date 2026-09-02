@@ -23,6 +23,7 @@
 
     <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
     <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+    <jacoco.plugin.version>0.8.12</jacoco.plugin.version>
   </properties>
 
   <dependencies>
@@ -64,6 +65,61 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven.surefire.plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.plugin.version}</version>
+        <configuration>
+          <!--
+            App (menu de console), MongoConfig e DoacaoMongoRepository sao
+            adaptadores finos de infraestrutura (I/O de console e driver do
+            MongoDB): exigem um Mongo real ou I/O interativo para exercitar,
+            entao ficam fora do calculo de cobertura. Os 70% exigidos pelo
+            edital incidem sobre a regra de negocio (model/service/exception).
+          -->
+          <excludes>
+            <exclude>br/com/unicesumar/aep/App.class</exclude>
+            <exclude>br/com/unicesumar/aep/config/**</exclude>
+            <exclude>br/com/unicesumar/aep/repository/DoacaoMongoRepository.class</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <phase>test</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>INSTRUCTION</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.70</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
