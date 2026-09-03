@@ -30,6 +30,19 @@ de depender de planilha ou anotação manual.
 **ODS 2 — Fome Zero e Agricultura Sustentável.** O sistema contribui para reduzir o desperdício de
 doações e melhorar a eficiência da distribuição de alimentos para quem precisa.
 
+## Tecnologias utilizadas
+
+| Tecnologia | Pra que serve aqui |
+|---|---|
+| **Java 17** | Linguagem principal (orientada a objetos) |
+| **Maven** | Compila o projeto e gerencia as dependências |
+| **MongoDB** | Banco de dados NoSQL — guarda as doações |
+| **Javalin** | Framework que expõe a API REST (endpoints HTTP) |
+| **Jackson** | Converte objetos Java em JSON e vice-versa |
+| **Swagger UI / OpenAPI** | Documentação interativa da API, testável no navegador |
+| **JUnit 5 + Mockito** | Testes automatizados |
+| **JaCoCo** | Mede a cobertura dos testes (mínimo 70% exigido) |
+
 ## Como rodar
 
 ### Pré-requisitos
