@@ -29,3 +29,62 @@ de depender de planilha ou anotação manual.
 
 **ODS 2 — Fome Zero e Agricultura Sustentável.** O sistema contribui para reduzir o desperdício de
 doações e melhorar a eficiência da distribuição de alimentos para quem precisa.
+
+## Como rodar
+
+### Pré-requisitos
+
+- Java 17+
+- Maven
+- MongoDB rodando local (`brew services start mongodb-community no meu caso (MacOS)`, ou instância própria)
+
+### Compilar
+
+```bash
+mvn compile
+```
+
+### Rodar a API REST
+
+O `exec-maven-plugin` no `pom.xml` está fixo na CLI (`App`), então pra rodar a API é
+preciso montar o classpath manualmente:
+
+```bash
+mvn dependency:build-classpath -Dmdep.outputFile=/tmp/cp.txt
+java -cp "target/classes:$(cat /tmp/cp.txt)" br.com.unicesumar.aep.RestApp
+```
+
+A API sobe em `http://localhost:8080` (configurável via variável `PORT`).
+
+### Acessar e testar a API
+
+- **Swagger UI** (testa direto no navegador): http://localhost:8080/swagger-ui.html
+- **Spec OpenAPI**: http://localhost:8080/openapi.yaml
+- Ou via curl:
+
+```bash
+curl -X POST http://localhost:8080/doacoes -H "Content-Type: application/json" \
+  -d '{"doador":"Maria","item":"Arroz","quantidade":10,"unidade":"kg","dataDoacao":"2026-08-20"}'
+
+curl http://localhost:8080/doacoes
+```
+
+### Rodar a CLI (alternativa à API)
+
+```bash
+mvn exec:java
+```
+
+### Rodar os testes e ver o relatório
+
+```bash
+mvn test surefire-report:report
+```
+
+- Resultado dos testes (passou/falhou, tempo): `target/site/surefire-report.html`
+- Cobertura de código (JaCoCo, mínimo 70%): `target/site/jacoco/index.html`
+
+```bash
+open target/site/surefire-report.html
+open target/site/jacoco/index.html
+```
