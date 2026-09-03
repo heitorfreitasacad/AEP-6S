@@ -1,0 +1,149 @@
+openapi: 3.0.3
+info:
+  title: AEP - Sistema de Gestao de Doacoes de Alimentos
+  description: API REST do CRUD de doacoes (ODS 2 - Fome Zero).
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /doacoes:
+    post:
+      summary: Registrar doacao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoacaoRequest'
+      responses:
+        '201':
+          description: Doacao criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doacao'
+        '400':
+          description: Dados invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    get:
+      summary: Listar doacoes
+      responses:
+        '200':
+          description: Lista de doacoes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Doacao'
+  /doacoes/{id}:
+    get:
+      summary: Buscar doacao por id
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Doacao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doacao'
+        '404':
+          description: Doacao nao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    delete:
+      summary: Remover doacao
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Removida com sucesso
+        '404':
+          description: Doacao nao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+  /doacoes/{id}/status:
+    patch:
+      summary: Atualizar status da doacao
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusRequest'
+      responses:
+        '204':
+          description: Status atualizado
+        '400':
+          description: Status invalido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '404':
+          description: Doacao nao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    DoacaoRequest:
+      type: object
+      required: [doador, item, quantidade, unidade, dataDoacao]
+      properties:
+        doador:
+          type: string
+          example: Maria Silva
+        item:
+          type: string
+          example: Arroz
+        quantidade:
+          type: number
+          example: 10
+        unidade:
+          type: string
+          example: kg
+        dataDoacao:
+          type: string
+          format: date
+          example: 2026-08-20
+    StatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [PENDENTE, RECEBIDA, DISTRIBUIDA, CANCELADA]
+    Doacao:
+      allOf:
+        - $ref: '#/components/schemas/DoacaoRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+              enum: [PENDENTE, RECEBIDA, DISTRIBUIDA, CANCELADA]
+    Erro:
+      type: object
+      properties:
+        erro:
+          type: string
