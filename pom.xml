@@ -118,6 +118,7 @@
             <exclude>br/com/unicesumar/aep/config/**</exclude>
             <exclude>br/com/unicesumar/aep/controller/**</exclude>
             <exclude>br/com/unicesumar/aep/repository/DoacaoMongoRepository.class</exclude>
+            <exclude>br/com/unicesumar/aep/repository/InstituicaoMongoRepository.class</exclude>
           </excludes>
         </configuration>
         <executions>
