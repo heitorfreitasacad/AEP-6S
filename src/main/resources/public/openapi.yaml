@@ -1,14 +1,15 @@
 openapi: 3.0.3
 info:
   title: AEP - Sistema de Gestao de Doacoes de Alimentos
-  description: API REST do CRUD de doacoes (ODS 2 - Fome Zero).
-  version: 1.0.0
+  description: API REST de doacoes e instituicoes (ODS 2 - Fome Zero).
+  version: 2.0.0
 servers:
   - url: /
 paths:
   /doacoes:
     post:
       summary: Registrar doacao
+      tags: [Doacoes]
       requestBody:
         required: true
         content:
@@ -30,6 +31,7 @@ paths:
                 $ref: '#/components/schemas/Erro'
     get:
       summary: Listar doacoes
+      tags: [Doacoes]
       responses:
         '200':
           description: Lista de doacoes
@@ -42,6 +44,7 @@ paths:
   /doacoes/{id}:
     get:
       summary: Buscar doacao por id
+      tags: [Doacoes]
       parameters:
         - $ref: '#/components/parameters/Id'
       responses:
@@ -59,6 +62,7 @@ paths:
                 $ref: '#/components/schemas/Erro'
     delete:
       summary: Remover doacao
+      tags: [Doacoes]
       parameters:
         - $ref: '#/components/parameters/Id'
       responses:
@@ -73,6 +77,7 @@ paths:
   /doacoes/{id}/status:
     patch:
       summary: Atualizar status da doacao
+      tags: [Doacoes]
       parameters:
         - $ref: '#/components/parameters/Id'
       requestBody:
@@ -92,6 +97,104 @@ paths:
                 $ref: '#/components/schemas/Erro'
         '404':
           description: Doacao nao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+  /instituicoes:
+    post:
+      summary: Cadastrar instituicao
+      tags: [Instituicoes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstituicaoRequest'
+      responses:
+        '201':
+          description: Instituicao criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instituicao'
+        '400':
+          description: Dados invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    get:
+      summary: Listar instituicoes
+      tags: [Instituicoes]
+      responses:
+        '200':
+          description: Lista de instituicoes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instituicao'
+  /instituicoes/{id}:
+    get:
+      summary: Buscar instituicao por id
+      tags: [Instituicoes]
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Instituicao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instituicao'
+        '404':
+          description: Instituicao nao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    put:
+      summary: Atualizar instituicao (substitui nome, endereco e contatos)
+      tags: [Instituicoes]
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstituicaoRequest'
+      responses:
+        '200':
+          description: Instituicao atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instituicao'
+        '400':
+          description: Dados invalidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+        '404':
+          description: Instituicao nao encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Erro'
+    delete:
+      summary: Remover instituicao
+      tags: [Instituicoes]
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Removida com sucesso
+        '404':
+          description: Instituicao nao encontrada
           content:
             application/json:
               schema:
@@ -142,6 +245,52 @@ components:
             status:
               type: string
               enum: [PENDENTE, RECEBIDA, DISTRIBUIDA, CANCELADA]
+    Endereco:
+      type: object
+      required: [rua, cidade, estado]
+      properties:
+        rua:
+          type: string
+          example: Rua A
+        cidade:
+          type: string
+          example: Maringa
+        estado:
+          type: string
+          example: PR
+    Contato:
+      type: object
+      required: [nome]
+      properties:
+        nome:
+          type: string
+          example: Ana
+        telefone:
+          type: string
+          example: "44999990000"
+        email:
+          type: string
+          example: ana@ong.org
+    InstituicaoRequest:
+      type: object
+      required: [nome, endereco]
+      properties:
+        nome:
+          type: string
+          example: Banco de Alimentos de Maringa
+        endereco:
+          $ref: '#/components/schemas/Endereco'
+        contatos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contato'
+    Instituicao:
+      allOf:
+        - $ref: '#/components/schemas/InstituicaoRequest'
+        - type: object
+          properties:
+            id:
+              type: string
     Erro:
       type: object
       properties:

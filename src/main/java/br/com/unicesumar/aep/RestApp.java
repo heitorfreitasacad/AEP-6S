@@ -2,10 +2,15 @@ package br.com.unicesumar.aep;
 
 import br.com.unicesumar.aep.config.MongoConfig;
 import br.com.unicesumar.aep.controller.DoacaoController;
+import br.com.unicesumar.aep.controller.InstituicaoController;
 import br.com.unicesumar.aep.exception.DoacaoInvalidaException;
 import br.com.unicesumar.aep.exception.DoacaoNaoEncontradaException;
+import br.com.unicesumar.aep.exception.InstituicaoInvalidaException;
+import br.com.unicesumar.aep.exception.InstituicaoNaoEncontradaException;
 import br.com.unicesumar.aep.repository.DoacaoMongoRepository;
+import br.com.unicesumar.aep.repository.InstituicaoMongoRepository;
 import br.com.unicesumar.aep.service.DoacaoService;
+import br.com.unicesumar.aep.service.InstituicaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -16,7 +21,7 @@ import io.javalin.json.JavalinJackson;
 import java.util.Map;
 
 /**
- * Ponto de entrada da API REST. Endpoints em /doacoes, documentacao
+ * Ponto de entrada da API REST. Endpoints em /doacoes e /instituicoes, documentacao
  * Swagger UI servida em /swagger-ui.html (spec estatica em /openapi.yaml).
  */
 public class RestApp {
@@ -24,6 +29,10 @@ public class RestApp {
     public static void main(String[] args) {
         DoacaoService service = new DoacaoService(new DoacaoMongoRepository(MongoConfig.getDatabase()));
         DoacaoController controller = new DoacaoController(service);
+
+        InstituicaoService instituicaoService =
+                new InstituicaoService(new InstituicaoMongoRepository(MongoConfig.getDatabase()));
+        InstituicaoController instituicaoController = new InstituicaoController(instituicaoService);
 
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
@@ -40,14 +49,24 @@ public class RestApp {
         app.patch("/doacoes/{id}/status", controller::atualizarStatus);
         app.delete("/doacoes/{id}", controller::remover);
 
+        app.post("/instituicoes", instituicaoController::registrar);
+        app.get("/instituicoes", instituicaoController::listar);
+        app.get("/instituicoes/{id}", instituicaoController::buscarPorId);
+        app.put("/instituicoes/{id}", instituicaoController::atualizar);
+        app.delete("/instituicoes/{id}", instituicaoController::remover);
+
         app.exception(DoacaoInvalidaException.class,
                 (e, ctx) -> ctx.status(400).json(Map.of("erro", e.getMessage())));
         app.exception(DoacaoNaoEncontradaException.class,
                 (e, ctx) -> ctx.status(404).json(Map.of("erro", e.getMessage())));
+        app.exception(InstituicaoInvalidaException.class,
+                (e, ctx) -> ctx.status(400).json(Map.of("erro", e.getMessage())));
+        app.exception(InstituicaoNaoEncontradaException.class,
+                (e, ctx) -> ctx.status(404).json(Map.of("erro", e.getMessage())));
 
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
         app.start(port);
-        System.out.println("API em http://localhost:" + port + "/doacoes");
+        System.out.println("API em http://localhost:" + port + "/doacoes e /instituicoes");
         System.out.println("Swagger UI em http://localhost:" + port + "/swagger-ui.html");
     }
 }
