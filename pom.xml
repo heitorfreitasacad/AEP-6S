@@ -106,17 +106,17 @@
         <version>${jacoco.plugin.version}</version>
         <configuration>
           <!--
-            App (menu de console), MongoConfig e DoacaoMongoRepository sao
-            adaptadores finos de infraestrutura (I/O de console e driver do
-            MongoDB): exigem um Mongo real ou I/O interativo para exercitar,
-            entao ficam fora do calculo de cobertura. Os 70% exigidos pelo
-            edital incidem sobre a regra de negocio (model/service/exception).
+            App (menu de console), RestApp, MongoConfig e os *MongoRepository
+            sao adaptadores finos de infraestrutura (I/O de console, bootstrap
+            do servidor e driver do MongoDB): exigem um Mongo real ou I/O
+            interativo para exercitar, entao ficam fora do calculo de
+            cobertura. Os 70% exigidos pelo edital incidem sobre
+            model/service/controller/exception.
           -->
           <excludes>
             <exclude>br/com/unicesumar/aep/App.class</exclude>
             <exclude>br/com/unicesumar/aep/RestApp.class</exclude>
             <exclude>br/com/unicesumar/aep/config/**</exclude>
-            <exclude>br/com/unicesumar/aep/controller/**</exclude>
             <exclude>br/com/unicesumar/aep/repository/DoacaoMongoRepository.class</exclude>
             <exclude>br/com/unicesumar/aep/repository/InstituicaoMongoRepository.class</exclude>
           </excludes>
