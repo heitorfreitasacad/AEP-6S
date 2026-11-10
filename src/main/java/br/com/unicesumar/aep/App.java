@@ -6,6 +6,7 @@ import br.com.unicesumar.aep.exception.DoacaoNaoEncontradaException;
 import br.com.unicesumar.aep.model.Doacao;
 import br.com.unicesumar.aep.model.StatusDoacao;
 import br.com.unicesumar.aep.repository.DoacaoMongoRepository;
+import br.com.unicesumar.aep.repository.InstituicaoMongoRepository;
 import br.com.unicesumar.aep.service.DoacaoService;
 
 import java.time.LocalDate;
@@ -16,7 +17,9 @@ import java.util.Scanner;
 public class App {
 
     public static void main(String[] args) {
-        DoacaoService service = new DoacaoService(new DoacaoMongoRepository(MongoConfig.getDatabase()));
+        DoacaoService service = new DoacaoService(
+                new DoacaoMongoRepository(MongoConfig.getDatabase()),
+                new InstituicaoMongoRepository(MongoConfig.getDatabase()));
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("=== AEP - Sistema de Gestao de Doacoes de Alimentos ===");
@@ -70,8 +73,10 @@ public class App {
             String unidade = scanner.nextLine().trim();
             System.out.print("Data da doacao (AAAA-MM-DD): ");
             LocalDate data = LocalDate.parse(scanner.nextLine().trim());
+            System.out.print("Id da instituicao destinataria: ");
+            String instituicaoId = scanner.nextLine().trim();
 
-            Doacao doacao = service.registrar(doador, item, quantidade, unidade, data);
+            Doacao doacao = service.registrar(doador, item, quantidade, unidade, data, instituicaoId);
             System.out.println("Doacao registrada com sucesso: " + doacao);
         } catch (NumberFormatException e) {
             System.out.println("Quantidade invalida.");

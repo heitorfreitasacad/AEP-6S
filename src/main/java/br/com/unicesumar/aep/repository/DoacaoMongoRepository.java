@@ -18,7 +18,8 @@ import java.util.Optional;
 
 /**
  * Implementacao MongoDB do repositorio de doacoes.
- * 1a entrega: colecao unica "doacoes" com documentos homogeneos.
+ * Colecao "doacoes"; instituicaoId e guardado como ObjectId (referencia a
+ * um documento da colecao "instituicoes").
  */
 public class DoacaoMongoRepository implements DoacaoRepository {
 
@@ -57,6 +58,18 @@ public class DoacaoMongoRepository implements DoacaoRepository {
     }
 
     @Override
+    public List<Doacao> listarPorInstituicao(String instituicaoId) {
+        List<Doacao> doacoes = new ArrayList<>();
+        if (!ObjectId.isValid(instituicaoId)) {
+            return doacoes;
+        }
+        for (Document documento : collection.find(Filters.eq("instituicaoId", new ObjectId(instituicaoId)))) {
+            doacoes.add(toDoacao(documento));
+        }
+        return doacoes;
+    }
+
+    @Override
     public boolean atualizarStatus(String id, StatusDoacao status) {
         if (!ObjectId.isValid(id)) {
             return false;
@@ -77,13 +90,17 @@ public class DoacaoMongoRepository implements DoacaoRepository {
     }
 
     private Document toDocument(Doacao doacao) {
-        return new Document()
+        Document documento = new Document()
                 .append("doador", doacao.getDoador())
                 .append("item", doacao.getItem())
                 .append("quantidade", doacao.getQuantidade())
                 .append("unidade", doacao.getUnidade())
                 .append("dataDoacao", doacao.getDataDoacao().toString())
                 .append("status", doacao.getStatus().name());
+        if (doacao.getInstituicaoId() != null) {
+            documento.append("instituicaoId", new ObjectId(doacao.getInstituicaoId()));
+        }
+        return documento;
     }
 
     private Doacao toDoacao(Document documento) {
@@ -95,6 +112,10 @@ public class DoacaoMongoRepository implements DoacaoRepository {
         doacao.setUnidade(documento.getString("unidade"));
         doacao.setDataDoacao(LocalDate.parse(documento.getString("dataDoacao")));
         doacao.setStatus(StatusDoacao.valueOf(documento.getString("status")));
+        ObjectId instituicaoId = documento.getObjectId("instituicaoId");
+        if (instituicaoId != null) {
+            doacao.setInstituicaoId(instituicaoId.toHexString());
+        }
         return doacao;
     }
 }

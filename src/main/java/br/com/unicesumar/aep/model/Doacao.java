@@ -4,8 +4,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * Doacao de alimentos feita por um doador.
- * Documento homogeneo de estrutura simples (1a entrega: colecao unica "doacoes").
+ * Doacao de alimentos feita por um doador e destinada a uma instituicao.
+ * Colecao "doacoes"; o campo instituicaoId referencia o _id de um documento
+ * da colecao "instituicoes" (relacionamento entre colecoes).
  */
 public class Doacao {
 
@@ -16,16 +17,19 @@ public class Doacao {
     private String unidade;
     private LocalDate dataDoacao;
     private StatusDoacao status;
+    private String instituicaoId;
 
     public Doacao() {
     }
 
-    public Doacao(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao) {
+    public Doacao(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao,
+                  String instituicaoId) {
         this.doador = doador;
         this.item = item;
         this.quantidade = quantidade;
         this.unidade = unidade;
         this.dataDoacao = dataDoacao;
+        this.instituicaoId = instituicaoId;
         this.status = StatusDoacao.PENDENTE;
     }
 
@@ -85,6 +89,14 @@ public class Doacao {
         this.status = status;
     }
 
+    public String getInstituicaoId() {
+        return instituicaoId;
+    }
+
+    public void setInstituicaoId(String instituicaoId) {
+        this.instituicaoId = instituicaoId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,6 +120,7 @@ public class Doacao {
                 ", unidade='" + unidade + '\'' +
                 ", dataDoacao=" + dataDoacao +
                 ", status=" + status +
+                ", instituicaoId='" + instituicaoId + '\'' +
                 '}';
     }
 }

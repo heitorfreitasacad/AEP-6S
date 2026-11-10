@@ -11,13 +11,14 @@ class DoacaoTest {
 
     @Test
     void deveCriarComConstrutorPreenchidoEStatusPendente() {
-        Doacao doacao = new Doacao("Joao", "Feijao", 10, "kg", LocalDate.of(2026, 1, 1));
+        Doacao doacao = new Doacao("Joao", "Feijao", 10, "kg", LocalDate.of(2026, 1, 1), "inst1");
 
         assertEquals("Joao", doacao.getDoador());
         assertEquals("Feijao", doacao.getItem());
         assertEquals(10, doacao.getQuantidade());
         assertEquals("kg", doacao.getUnidade());
         assertEquals(LocalDate.of(2026, 1, 1), doacao.getDataDoacao());
+        assertEquals("inst1", doacao.getInstituicaoId());
         assertEquals(StatusDoacao.PENDENTE, doacao.getStatus());
     }
 
@@ -31,6 +32,7 @@ class DoacaoTest {
         doacao.setUnidade("kg");
         doacao.setDataDoacao(LocalDate.now());
         doacao.setStatus(StatusDoacao.RECEBIDA);
+        doacao.setInstituicaoId("inst2");
 
         assertEquals("1", doacao.getId());
         assertEquals("Maria", doacao.getDoador());
@@ -38,6 +40,7 @@ class DoacaoTest {
         assertEquals(5, doacao.getQuantidade());
         assertEquals("kg", doacao.getUnidade());
         assertEquals(StatusDoacao.RECEBIDA, doacao.getStatus());
+        assertEquals("inst2", doacao.getInstituicaoId());
     }
 
     @Test

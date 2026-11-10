@@ -21,12 +21,17 @@ public class DoacaoController {
 
     public void registrar(Context ctx) {
         DoacaoRequest body = ctx.bodyAsClass(DoacaoRequest.class);
-        Doacao doacao = service.registrar(body.doador(), body.item(), body.quantidade(), body.unidade(), body.dataDoacao());
+        Doacao doacao = service.registrar(body.doador(), body.item(), body.quantidade(), body.unidade(),
+                body.dataDoacao(), body.instituicaoId());
         ctx.status(201).json(doacao);
     }
 
     public void listar(Context ctx) {
         ctx.json(service.listar());
+    }
+
+    public void listarPorInstituicao(Context ctx) {
+        ctx.json(service.listarPorInstituicao(ctx.pathParam("id")));
     }
 
     public void buscarPorId(Context ctx) {
@@ -45,7 +50,8 @@ public class DoacaoController {
         ctx.status(204);
     }
 
-    public record DoacaoRequest(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao) {
+    public record DoacaoRequest(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao,
+                          String instituicaoId) {
     }
 
     public record StatusRequest(StatusDoacao status) {

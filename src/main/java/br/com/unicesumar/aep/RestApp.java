@@ -27,11 +27,12 @@ import java.util.Map;
 public class RestApp {
 
     public static void main(String[] args) {
-        DoacaoService service = new DoacaoService(new DoacaoMongoRepository(MongoConfig.getDatabase()));
+        InstituicaoMongoRepository instituicaoRepository = new InstituicaoMongoRepository(MongoConfig.getDatabase());
+        DoacaoService service = new DoacaoService(
+                new DoacaoMongoRepository(MongoConfig.getDatabase()), instituicaoRepository);
         DoacaoController controller = new DoacaoController(service);
 
-        InstituicaoService instituicaoService =
-                new InstituicaoService(new InstituicaoMongoRepository(MongoConfig.getDatabase()));
+        InstituicaoService instituicaoService = new InstituicaoService(instituicaoRepository);
         InstituicaoController instituicaoController = new InstituicaoController(instituicaoService);
 
         ObjectMapper mapper = new ObjectMapper()
@@ -54,6 +55,7 @@ public class RestApp {
         app.get("/instituicoes/{id}", instituicaoController::buscarPorId);
         app.put("/instituicoes/{id}", instituicaoController::atualizar);
         app.delete("/instituicoes/{id}", instituicaoController::remover);
+        app.get("/instituicoes/{id}/doacoes", controller::listarPorInstituicao);
 
         app.exception(DoacaoInvalidaException.class,
                 (e, ctx) -> ctx.status(400).json(Map.of("erro", e.getMessage())));

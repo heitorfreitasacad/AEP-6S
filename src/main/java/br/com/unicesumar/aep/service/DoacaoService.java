@@ -2,33 +2,46 @@ package br.com.unicesumar.aep.service;
 
 import br.com.unicesumar.aep.exception.DoacaoInvalidaException;
 import br.com.unicesumar.aep.exception.DoacaoNaoEncontradaException;
+import br.com.unicesumar.aep.exception.InstituicaoNaoEncontradaException;
 import br.com.unicesumar.aep.model.Doacao;
 import br.com.unicesumar.aep.model.StatusDoacao;
 import br.com.unicesumar.aep.repository.DoacaoRepository;
+import br.com.unicesumar.aep.repository.InstituicaoRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 
 /**
  * Regras de negocio do cadastro de doacoes: validacao de dados
- * de entrada e traducao de "nao encontrado" em excecao de dominio.
+ * de entrada (incluindo a existencia da instituicao destinataria) e
+ * traducao de "nao encontrado" em excecao de dominio.
  */
 public class DoacaoService {
 
     private final DoacaoRepository repository;
+    private final InstituicaoRepository instituicaoRepository;
 
-    public DoacaoService(DoacaoRepository repository) {
+    public DoacaoService(DoacaoRepository repository, InstituicaoRepository instituicaoRepository) {
         this.repository = repository;
+        this.instituicaoRepository = instituicaoRepository;
     }
 
-    public Doacao registrar(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao) {
-        validar(doador, item, quantidade, unidade, dataDoacao);
-        Doacao doacao = new Doacao(doador, item, quantidade, unidade, dataDoacao);
+    public Doacao registrar(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao,
+                            String instituicaoId) {
+        validar(doador, item, quantidade, unidade, dataDoacao, instituicaoId);
+        Doacao doacao = new Doacao(doador, item, quantidade, unidade, dataDoacao, instituicaoId);
         return repository.salvar(doacao);
     }
 
     public List<Doacao> listar() {
         return repository.listarTodas();
+    }
+
+    public List<Doacao> listarPorInstituicao(String instituicaoId) {
+        if (instituicaoRepository.buscarPorId(instituicaoId).isEmpty()) {
+            throw new InstituicaoNaoEncontradaException(instituicaoId);
+        }
+        return repository.listarPorInstituicao(instituicaoId);
     }
 
     public Doacao buscarPorId(String id) {
@@ -53,7 +66,8 @@ public class DoacaoService {
         }
     }
 
-    private void validar(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao) {
+    private void validar(String doador, String item, double quantidade, String unidade, LocalDate dataDoacao,
+                         String instituicaoId) {
         if (doador == null || doador.isBlank()) {
             throw new DoacaoInvalidaException("Doador e obrigatorio.");
         }
@@ -71,6 +85,12 @@ public class DoacaoService {
         }
         if (dataDoacao.isAfter(LocalDate.now())) {
             throw new DoacaoInvalidaException("Data da doacao nao pode ser futura.");
+        }
+        if (instituicaoId == null || instituicaoId.isBlank()) {
+            throw new DoacaoInvalidaException("Instituicao e obrigatoria.");
+        }
+        if (instituicaoRepository.buscarPorId(instituicaoId).isEmpty()) {
+            throw new DoacaoInvalidaException("Instituicao nao encontrada para o id: " + instituicaoId);
         }
     }
 }

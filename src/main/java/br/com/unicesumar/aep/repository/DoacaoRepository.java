@@ -14,6 +14,8 @@ public interface DoacaoRepository {
 
     List<Doacao> listarTodas();
 
+    List<Doacao> listarPorInstituicao(String instituicaoId);
+
     boolean atualizarStatus(String id, StatusDoacao status);
 
     boolean remover(String id);
