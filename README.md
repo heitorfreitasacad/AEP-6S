@@ -17,8 +17,9 @@ doadores individuais e precisam acompanhar o ciclo da doação — do recebiment
 
 Centraliza o registro das doações em um único lugar, permitindo:
 
-- Cadastrar uma nova doação (doador, item, quantidade, data);
-- Consultar as doações registradas;
+- Cadastrar as **instituições** (ONGs/bancos de alimentos) com endereço e contatos;
+- Cadastrar uma nova doação (doador, item, quantidade, data) destinada a uma instituição;
+- Consultar as doações registradas, inclusive as de uma instituição específica;
 - Atualizar o status de uma doação (pendente → recebida → distribuída, ou cancelada);
 - Remover um registro.
 
@@ -36,7 +37,7 @@ doações e melhorar a eficiência da distribuição de alimentos para quem prec
 |---|---|
 | **Java 17** | Linguagem principal (orientada a objetos) |
 | **Maven** | Compila o projeto e gerencia as dependências |
-| **MongoDB** | Banco de dados NoSQL — guarda as doações |
+| **MongoDB** | Banco de dados NoSQL — duas coleções (`doacoes` e `instituicoes`) relacionadas por referência |
 | **Javalin** | Framework que expõe a API REST (endpoints HTTP) |
 | **Jackson** | Converte objetos Java em JSON e vice-versa |
 | **Swagger UI / OpenAPI** | Documentação interativa da API, testável no navegador |
@@ -76,10 +77,23 @@ A API sobe em `http://localhost:8080` (configurável via variável `PORT`).
 - Ou via curl:
 
 ```bash
-curl -X POST http://localhost:8080/doacoes -H "Content-Type: application/json" \
-  -d '{"doador":"Maria","item":"Arroz","quantidade":10,"unidade":"kg","dataDoacao":"2026-08-20"}'
-
+curl http://localhost:8080/instituicoes
 curl http://localhost:8080/doacoes
+```
+
+Fluxo completo com o relacionamento (a doação exige uma instituição existente):
+
+```bash
+# 1) cadastrar a instituição e guardar o id retornado
+curl -X POST http://localhost:8080/instituicoes -H "Content-Type: application/json" \
+  -d '{"nome":"Banco de Alimentos de Maringa","endereco":{"rua":"Rua A","cidade":"Maringa","estado":"PR"},"contatos":[{"nome":"Ana","telefone":"44999990000","email":"ana@ong.org"}]}'
+
+# 2) registrar a doação apontando para essa instituição
+curl -X POST http://localhost:8080/doacoes -H "Content-Type: application/json" \
+  -d '{"doador":"Maria","item":"Arroz","quantidade":10,"unidade":"kg","dataDoacao":"2026-08-20","instituicaoId":"<ID_DA_INSTITUICAO>"}'
+
+# 3) listar as doações da instituição
+curl http://localhost:8080/instituicoes/<ID_DA_INSTITUICAO>/doacoes
 ```
 
 ### Rodar a CLI (alternativa à API)
@@ -87,6 +101,8 @@ curl http://localhost:8080/doacoes
 ```bash
 mvn exec:java
 ```
+
+O menu cobre doações (1 a 4), instituições (5 a 8) e as doações de uma instituição (9).
 
 ### Rodar os testes e ver o relatório
 
@@ -101,3 +117,17 @@ mvn test surefire-report:report
 open target/site/surefire-report.html
 open target/site/jacoco/index.html
 ```
+
+## Documentação técnica
+
+- [Estrutura do banco de dados](docs/banco-de-dados.md): coleções, documentos de exemplo, relacionamento
+- [Arquitetura](docs/arquitetura.md): camadas, pacotes, endpoints, erros, testes
+- [Quadro de tarefas](docs/quadro-de-tarefas.md): metodologia de trabalho (Kanban)
+- Especificação OpenAPI: `src/main/resources/public/openapi.yaml`
+
+## Versões entregues
+
+| Entrega | Tag | Conteúdo |
+|---|---|---|
+| 1ª | `entrega-1` | CRUD de doações, coleção única |
+| 2ª | `entrega-2` | Coleção `instituicoes` (documento aninhado + lista de subdocumentos) e relacionamento com `doacoes` |
