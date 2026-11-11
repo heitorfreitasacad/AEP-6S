@@ -55,6 +55,16 @@ flowchart LR
 Registrar doação com `instituicaoId` inexistente retorna 400 (referência inválida no corpo);
 `GET /instituicoes/{id}/doacoes` com id inexistente retorna 404 (recurso do caminho).
 
+### Limitações conhecidas
+
+- **JSON malformado, `status` fora do enum e contato `null` na lista** retornam **500** em vez de 400,
+  porque só as exceções de domínio têm tratamento. O `openapi.yaml` descreve o 400 esperado para esses
+  casos; hoje o retorno real é 500.
+- **`quantidade` salva como inteiro direto no MongoDB** (por exemplo, inserida à mão no `mongosh`) faz
+  `GET /doacoes` retornar 500, pois o repositório lê o campo como `double`. Documentos criados pela
+  aplicação são sempre `double`.
+- **Remover uma instituição** não apaga nem bloqueia as doações associadas (ver `docs/banco-de-dados.md`).
+
 ## Endpoints
 
 | Método | Rota | Descrição |
