@@ -130,8 +130,12 @@ O menu cobre doações (1 a 4), instituições (5 a 8) e as doações de uma ins
 mvn test surefire-report:report
 ```
 
+Os testes **não precisam do MongoDB nem do Docker**: os repositórios, a API e a CLI são testados contra um
+MongoDB em memória. Basta ter Java 17 ou 21 e Maven.
+
 - Resultado dos testes (passou/falhou, tempo): `target/site/surefire-report.html`
-- Cobertura de código (JaCoCo, mínimo 70%): `target/site/jacoco/index.html`
+- Cobertura de código (JaCoCo, mínimo 70%, o build falha abaixo disso): `target/site/jacoco/index.html`
+- A cobertura é medida sobre todo o código, exceto a classe `MongoConfig` (conexão real com o banco).
 
 ```bash
 open target/site/surefire-report.html

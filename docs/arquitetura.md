@@ -70,7 +70,13 @@ Especificação completa: `src/main/resources/public/openapi.yaml` (Swagger UI e
 
 ## Testes e cobertura
 
-- JUnit 5 + Mockito; services e controllers testados com dependências mockadas.
+- JUnit 5 + Mockito: services e controllers testados com dependências mockadas.
+- **Repositórios MongoDB** testados contra um MongoDB em memória (`mongo-java-server`, só em escopo de
+  teste): não precisa de Docker nem de `mongod` instalado, então os testes rodam em qualquer máquina.
+  Cobrem o documento aninhado (`endereco`), a lista de subdocumentos (`contatos`) e a referência
+  `instituicaoId` (guardada como `ObjectId`).
+- **API REST de ponta a ponta** (`RestAppTest`, com `javalin-testtools`): HTTP → controller → service →
+  repositório → MongoDB em memória, incluindo o relacionamento entre as coleções e os códigos 400/404.
+- **CLI** (`AppTest`): entrada simulada, serviços reais sobre o MongoDB em memória.
 - JaCoCo com regra de **mínimo 70%** de instruções (`mvn test` falha abaixo disso).
-- Ficam fora da medição apenas adaptadores finos de infraestrutura (`App`, `RestApp`, `config`,
-  `*MongoRepository`), que exigem MongoDB real ou entrada interativa. Ver `pom.xml`.
+- Única classe fora da medição: `MongoConfig` (lê variáveis de ambiente e abre a conexão real). Ver `pom.xml`.
