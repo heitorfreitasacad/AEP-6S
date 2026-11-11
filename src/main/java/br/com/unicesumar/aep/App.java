@@ -28,8 +28,13 @@ public class App {
         DoacaoService service = new DoacaoService(
                 new DoacaoMongoRepository(MongoConfig.getDatabase()), instituicaoRepository);
         InstituicaoService instituicaoService = new InstituicaoService(instituicaoRepository);
-        Scanner scanner = new Scanner(System.in);
 
+        executar(service, instituicaoService, new Scanner(System.in));
+
+        MongoConfig.close();
+    }
+
+    static void executar(DoacaoService service, InstituicaoService instituicaoService, Scanner scanner) {
         System.out.println("=== AEP - Sistema de Gestao de Doacoes de Alimentos ===");
 
         boolean continuar = true;
@@ -72,7 +77,6 @@ public class App {
             }
         }
 
-        MongoConfig.close();
         System.out.println("Encerrado.");
     }
 
