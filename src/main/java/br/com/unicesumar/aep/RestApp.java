@@ -14,6 +14,7 @@ import br.com.unicesumar.aep.service.InstituicaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mongodb.client.MongoDatabase;
 import io.javalin.Javalin;
 import io.javalin.http.staticfiles.Location;
 import io.javalin.json.JavalinJackson;
@@ -27,9 +28,17 @@ import java.util.Map;
 public class RestApp {
 
     public static void main(String[] args) {
-        InstituicaoMongoRepository instituicaoRepository = new InstituicaoMongoRepository(MongoConfig.getDatabase());
-        DoacaoService service = new DoacaoService(
-                new DoacaoMongoRepository(MongoConfig.getDatabase()), instituicaoRepository);
+        Javalin app = criarApp(MongoConfig.getDatabase());
+
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
+        app.start(port);
+        System.out.println("API em http://localhost:" + port + "/doacoes e /instituicoes");
+        System.out.println("Swagger UI em http://localhost:" + port + "/swagger-ui.html");
+    }
+
+    public static Javalin criarApp(MongoDatabase database) {
+        InstituicaoMongoRepository instituicaoRepository = new InstituicaoMongoRepository(database);
+        DoacaoService service = new DoacaoService(new DoacaoMongoRepository(database), instituicaoRepository);
         DoacaoController controller = new DoacaoController(service);
 
         InstituicaoService instituicaoService = new InstituicaoService(instituicaoRepository);
@@ -66,9 +75,6 @@ public class RestApp {
         app.exception(InstituicaoNaoEncontradaException.class,
                 (e, ctx) -> ctx.status(404).json(Map.of("erro", e.getMessage())));
 
-        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
-        app.start(port);
-        System.out.println("API em http://localhost:" + port + "/doacoes e /instituicoes");
-        System.out.println("Swagger UI em http://localhost:" + port + "/swagger-ui.html");
+        return app;
     }
 }
