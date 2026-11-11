@@ -48,9 +48,29 @@ doações e melhorar a eficiência da distribuição de alimentos para quem prec
 
 ### Pré-requisitos
 
-- Java 17+
+- Java 17 ou 21 (JDKs mais novos, como o 26, quebram os testes que usam Mockito)
 - Maven
-- MongoDB rodando local (`brew services start mongodb-community no meu caso (MacOS)`, ou instância própria)
+- MongoDB rodando em `localhost:27017` (ou outra instância, via variáveis `MONGODB_URI` e `MONGODB_DATABASE`)
+
+### Subir o MongoDB
+
+Escolha uma das opções:
+
+```bash
+# Homebrew (macOS): inicia o mongod direto, sem depender do brew services
+mongod --config /opt/homebrew/etc/mongod.conf
+```
+
+```bash
+# Docker
+docker run -d --name aep-mongo -p 27017:27017 mongo:7
+```
+
+Para conferir que o banco está de pé:
+
+```bash
+mongosh --eval 'db.runCommand({ping:1})'
+```
 
 ### Compilar
 
