@@ -30,6 +30,7 @@
     <javalin.version>6.3.0</javalin.version>
     <jackson.version>2.17.2</jackson.version>
     <slf4j.version>2.0.13</slf4j.version>
+    <mongo.java.server.version>1.47.0</mongo.java.server.version>
   </properties>
 
   <dependencies>
@@ -79,6 +80,19 @@
       <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Mongo em memoria (sem Docker/instalacao) para testar repositorios e a API de ponta a ponta -->
+    <dependency>
+      <groupId>de.bwaldvogel</groupId>
+      <artifactId>mongo-java-server</artifactId>
+      <version>${mongo.java.server.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.javalin</groupId>
+      <artifactId>javalin-testtools</artifactId>
+      <version>${javalin.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -106,19 +120,13 @@
         <version>${jacoco.plugin.version}</version>
         <configuration>
           <!--
-            App (menu de console), RestApp, MongoConfig e os *MongoRepository
-            sao adaptadores finos de infraestrutura (I/O de console, bootstrap
-            do servidor e driver do MongoDB): exigem um Mongo real ou I/O
-            interativo para exercitar, entao ficam fora do calculo de
-            cobertura. Os 70% exigidos pelo edital incidem sobre
-            model/service/controller/exception.
+            Unica exclusao: MongoConfig (le variaveis de ambiente e abre a
+            conexao real com o banco, 28 instrucoes). Todo o resto e medido e
+            testado: CLI (App), API REST (RestApp), controllers, services e
+            repositorios MongoDB (usando Mongo em memoria, ver MongoEmMemoria).
           -->
           <excludes>
-            <exclude>br/com/unicesumar/aep/App.class</exclude>
-            <exclude>br/com/unicesumar/aep/RestApp.class</exclude>
             <exclude>br/com/unicesumar/aep/config/**</exclude>
-            <exclude>br/com/unicesumar/aep/repository/DoacaoMongoRepository.class</exclude>
-            <exclude>br/com/unicesumar/aep/repository/InstituicaoMongoRepository.class</exclude>
           </excludes>
         </configuration>
         <executions>
