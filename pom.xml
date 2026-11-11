@@ -164,6 +164,7 @@
         <version>${exec.plugin.version}</version>
         <configuration>
           <mainClass>br.com.unicesumar.aep.App</mainClass>
+          <cleanupDaemonThreads>false</cleanupDaemonThreads>
         </configuration>
       </plugin>
     </plugins>

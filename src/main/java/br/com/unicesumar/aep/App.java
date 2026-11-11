@@ -72,6 +72,7 @@ public class App {
             }
         }
 
+        MongoConfig.close();
         System.out.println("Encerrado.");
     }
 

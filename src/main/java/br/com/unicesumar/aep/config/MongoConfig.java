@@ -27,4 +27,11 @@ public final class MongoConfig {
         String database = System.getenv().getOrDefault("MONGODB_DATABASE", DEFAULT_DATABASE);
         return client.getDatabase(database);
     }
+
+    public static synchronized void close() {
+        if (client != null) {
+            client.close();
+            client = null;
+        }
+    }
 }
